@@ -5,7 +5,7 @@ import path from 'path';
 const metadataStorePath = path.join(
     __dirname,
     '..',
-    'metadata.json'
+    './metadata/latest.json'
 )
 
 

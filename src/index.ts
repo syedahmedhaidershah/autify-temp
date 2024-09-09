@@ -8,9 +8,10 @@ import path from 'path';
 /** Local dependencies and declarations */
 import { processUrl } from './processors/url-processor.processor';
 import { cliFlags } from './helpers/cli-flags.helper';
+import fs from './libs/fs-promisifed.lib';
 
 const extractionDirectory = './extracted';
-const metadataStoreFile = './metadata.json'
+const metadataStoreDirectory = './metadata'
 
 
 /** Process flow */
@@ -46,6 +47,13 @@ const main = async () => {
                  * Actions for metadata flag
                  */
                 if (flags.includes('metadata')) {
+                    const metaFile = metadataStoreDirectory.concat('/latest.json');
+
+                    if(!await fs.exists(metaFile)) {
+                        await fs.mkdir(metadataStoreDirectory, { recursive: true });
+                        await fs.writeFile(metaFile, '{}');
+                    }
+
                     const metadatas = await Promise.all(
                         urls.map(async url => {
                             const metadata = await cliFlags.metadata.reslover(url);
@@ -65,7 +73,7 @@ const main = async () => {
                  * Normal ELT flow
                  */
                 const assetsDir = path.join(__dirname, extractionDirectory);
-                const metadataStore = path.join(__dirname, metadataStoreFile);
+                const metadataStore = path.join(__dirname, metadataStoreDirectory);
 
 
                 const data = await processUrl(

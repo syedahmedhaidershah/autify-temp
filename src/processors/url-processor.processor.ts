@@ -46,6 +46,7 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
     const cleanUrl = url.replace(/https?:\/\//, '');
 
     await fs.mkdir(assetsDir, { recursive: true });
+    await fs.mkdir(metadataStore, { recursive: true });
 
     // Parse HTML to find assets
     const useDom = new JSDOM(data);
@@ -67,12 +68,14 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
     const numImages = document.querySelectorAll('img').length;
     const lastFetch = new Date().toUTCString();
 
-    const metadataStoreExists = await fs.exists(metadataStore);
-    if (!metadataStoreExists) {
-        await fs.writeFile(metadataStore, '{}');
-    }
+    // console.log(metadataStore);
+    // const metadataStoreExists = await fs.exists(metadataStore);
+    // if (!metadataStoreExists) {
+    //     await fs.writeFile(metadataStore, '{}');
+    // }
 
-    let metaData = await import(metadataStore);
+    const metadataFile = metadataStore.concat('/latest.json');
+    let metaData = await import(metadataFile);
     metaData = { ...metaData };
     delete metaData.default;
 
@@ -83,7 +86,7 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
         lastFetch,
     };
 
-    await fs.writeFile(metadataStore, JSON.stringify(metaData, null, 2));
+    await fs.writeFile(metadataFile, JSON.stringify(metaData, null, 2));
 
     console.log(`site: ${cleanUrl}`);
     console.log(`num_links: ${numLinks}`);

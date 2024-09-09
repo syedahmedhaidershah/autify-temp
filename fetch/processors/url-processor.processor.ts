@@ -51,19 +51,15 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
     const useDom = new JSDOM(data);
     const document = useDom.window.document;
 
-    const imageTags = Array.from(
-        document.querySelectorAll('img')
-    )
+    const imageTags = Array
+        .from(document.querySelectorAll('img'))
         .map((img) => (img as HTMLImageElement).src);
 
-    const styleSheets = Array.from(
-        document.querySelectorAll('link[rel="stylesheet"]')
-    )
+    const styleSheets = Array
+        .from(document.querySelectorAll('link[rel="stylesheet"]'))
         .map((link) => (link as HTMLLinkElement).href);
 
-    const scripts = Array.from(
-        document.querySelectorAll('script[src]')
-    )
+    const scripts = Array.from(document.querySelectorAll('script[src]'))
         .map((script) => (script as HTMLScriptElement).src);
 
     // Print metadata
@@ -106,11 +102,7 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
             .map(async assetUrl => {
                 const useAssetUrl = url.concat(assetUrl);
 
-                console.log(`--- assetUrl: ${assetUrl}`);
-                console.log(`\n\n${useAssetUrl}\n\n`);
                 const localPath = await downloadAsset(useAssetUrl, assetsDir);
-
-                console.log('--- downloaded localPath: ', localPath);
 
                 if (localPath) {
                     const relativePath = path.relative(
@@ -118,33 +110,22 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
                         localPath
                     );
 
-                    console.log('--- relativePath: ', relativePath);
-                    console.log('--- assetsDir: ', assetsDir);
-
                     if (useAssetUrl.endsWith('css')) {
                         const linkTag = document.querySelector(`link[href="${assetUrl}"]`) as HTMLLinkElement;
-                        console.log('--- css linkTag old href: ', relativePath);
-                        console.log('--- setting css linkTag: ', relativePath);
                         linkTag!.href = relativePath;
                     } else if (useAssetUrl.endsWith('js')) {
-                        console.log('--- js scriptTag old src: ', assetUrl);
-                        console.log('--- setting js scriptTag: ', relativePath);
                         const scriptTag = document.querySelector(`script[src="${assetUrl}"]`) as HTMLScriptElement;
                         scriptTag!.src = relativePath;
                     } else if (useAssetUrl.endsWith('png') || useAssetUrl.endsWith('jpg') || useAssetUrl.endsWith('jpeg') || useAssetUrl.endsWith('gif')) {
-                        console.log('--- img imgTag old src: ', assetUrl);
-                        console.log('--- setting img imgTag: ', relativePath);
                         const imgTag = document.querySelector(`img[src="${assetUrl}"]`) as HTMLImageElement;
                         imgTag!.src = relativePath;
                     } else {
                         const linkTag = document.querySelector(`link[href="${assetUrl}"]`) as HTMLLinkElement;
-                        console.log('--- css linkTag old href: ', relativePath);
-                        console.log('--- setting css linkTag: ', relativePath);
                         linkTag!.href = relativePath;
                     }
                 }
             })
-        );
+    );
 
     /** Updating base */
     const previousBase = document.querySelector('base');
@@ -153,7 +134,6 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
         document.head.removeChild(previousBase);
     }
     const baseTag = document.createElement('base');
-    console.log('--- setting baseTag: ', assetsDir);
     baseTag.href = assetsDir;
     document.head.appendChild(baseTag);
 

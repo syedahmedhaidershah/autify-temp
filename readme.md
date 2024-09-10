@@ -20,8 +20,10 @@ docker run --rm \
 ```
 The command syntax:
 ```md
-docker run -d --rm --network host -v ./extracted/:/home/node/app/src/extracted -v ./metadata:/home/node/app/src/metadata <YOUR_IMAGE_NAME> <ARG1> <ARG2> ... <ARGN>
+docker run --rm --network host -v ./extracted/:/home/node/app/src/extracted -v ./metadata:/home/node/app/src/metadata <YOUR_IMAGE_NAME> <ARG1> <ARG2> ... <ARGN>
 ```
+#### Successful Run (Via Docker) example:
+![Sucessful run via docker](./docs/assets/img/Screenshot%202024-09-10%20at%2013.33.38.png)
 
 ### Note using this as a CLI utility, you can pass all arguments as you would have to the source utility
 For eg:

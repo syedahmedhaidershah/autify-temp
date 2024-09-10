@@ -36,6 +36,9 @@ export const downloadAsset = async (assetUrl: string, baseDir: string): Promise<
 
 
 export const processUrl = async (url: string, options: processUrlOptionsType): Promise<processedUrlType> => {
+    //  Trim trailing slash from url
+    url = url.replace(/\/$/, '');
+
     const { data } = await axios.get(url);
 
     const {

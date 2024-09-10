@@ -30,7 +30,8 @@ export const cliFlagsExtractor = (cliArguments: string[]) => {
 export const cliFlagsResolver = {
     'metadata': {
         resolver: async (url: string) => {
-            const cleanUrl = url.replace(/https?:\/\//, '');
+            let cleanUrl = url.replace(/https?:\/\//, '');
+            cleanUrl = cleanUrl.replace(/\/$/, '');
             try {
                 var metadata = await import(metadataStorePath);
             } catch (exc) {

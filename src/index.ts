@@ -7,7 +7,7 @@ import path from 'path';
 
 /** Local dependencies and declarations */
 import { processUrl } from './processors/url-processor.processor';
-import { cliFlags } from './helpers/cli-flags.helper';
+import { cliFlagsResolver, cliFlagsExtractor } from './helpers/cli-flags.helper';
 import fs from './libs/fs-promisifed.lib';
 
 const extractionDirectory = './extracted';
@@ -24,18 +24,11 @@ const [...urls] = argv.slice(2);
  * @note Avaliable flags:
  * 1. --metadata
  */
-const flags = urls
-    .filter((url, index) => {
-        const isFlag = url.startsWith('--');
-        if (isFlag)
-            urls.splice(index, 1);
+const flags = cliFlagsExtractor(urls);
 
-        return isFlag;
-    })
-    .map(url => url.replace(/^--/, ''));
 
 /** 
- * Main ELT function
+ * Main ETL function
  * @returns {Promise<void>}
  * */
 const main = async () => {
@@ -49,20 +42,20 @@ const main = async () => {
                 if (flags.includes('metadata')) {
                     const metaFile = metadataStoreDirectory.concat('/latest.json');
 
-                    if(!await fs.exists(metaFile)) {
+                    if (!await fs.exists(metaFile)) {
                         await fs.mkdir(metadataStoreDirectory, { recursive: true });
                         await fs.writeFile(metaFile, '{}');
                     }
 
                     const metadatas = await Promise.all(
                         urls.map(async url => {
-                            const metadata = await cliFlags.metadata.reslover(url);
-                            return metadata;
+                            const metadata = await cliFlagsResolver.metadata.resolver(url);
+                            return { metadata, url };
                         })
-                    );
+                    )
 
                     for (let metadata of metadatas) {
-                        console.log(`-- URL: ${url}`);
+                        console.log(`\n--------- URL: ${metadata.url} ---------`);
                         console.log(metadata);
                     }
 
@@ -70,7 +63,7 @@ const main = async () => {
                 }
 
                 /**
-                 * Normal ELT flow
+                 * Normal ETL flow
                  */
                 const assetsDir = path.join(__dirname, extractionDirectory);
                 const metadataStore = path.join(__dirname, metadataStoreDirectory);

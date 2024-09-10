@@ -9,12 +9,34 @@ const metadataStorePath = path.join(
 )
 
 
-export const cliFlags = {
+
+/**
+ * @param urls 
+ * @returns 
+ */
+export const cliFlagsExtractor = (cliArguments: string[]) => {
+    return cliArguments
+        .filter((cliArgument, index) => {
+            const isFlag = cliArgument.startsWith('--');
+            if (isFlag)
+                cliArguments.splice(index, 1);
+
+            return isFlag;
+        })
+        .map(url => url.replace(/^--/, ''));
+}
+
+
+export const cliFlagsResolver = {
     'metadata': {
-        reslover: async (url: string) => {
+        resolver: async (url: string) => {
             const cleanUrl = url.replace(/https?:\/\//, '');
-            const metadata = await import(metadataStorePath);
-            return metadata[cleanUrl] || 'Not fetched yet - no metadata';         
+            try {
+                var metadata = await import(metadataStorePath);
+            } catch (exc) {
+                console.error('Failed to import metadata', (exc as any)?.message);
+            }
+            return metadata?.[cleanUrl] || 'Not fetched yet - no metadata';         
         }
     }
 }

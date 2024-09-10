@@ -33,7 +33,7 @@ docker run --rm --network host -v ./extracted/:/home/node/app/src/extracted -v .
 1. You can directly invoke the source code by invoking:
 ```bash
 cd src # pushd src - popd after the commands
-pnpm i # npm i - if you prefere
+pnpm i # npm i - if you prefer
 cd ..
 ./fetch https://example.com
 # OR ts-node ./src/index.ts https://example.com
@@ -44,7 +44,8 @@ You could also connect your shell to a running container, by the following comma
 ```bash
 CONTAINER_ID=$(docker run -d --rm --network host -v ./extracted/:/home/node/app/src/extracted -v ./metadata:/home/node/app/src/metadata autify-test:latest IT)
 docker exec -it $CONTAINER_ID /bin/bash 
-# Continue witht he alternative steps (1) However everything has been already set up
-./fetch https://example.com
+# Continue with he alternative steps (1) However everything has been already set up
+# It is docker desktop, since I am running docker engine via desktop, you could have a differing host.
+node@docker-desktop:~/app$ ./fetch https://example.com
 ```
 

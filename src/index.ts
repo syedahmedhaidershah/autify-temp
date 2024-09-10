@@ -10,6 +10,7 @@ import { processUrl } from './processors/url-processor.processor';
 import { cliFlagsResolver, cliFlagsExtractor } from './helpers/cli-flags.helper';
 import fs from './libs/fs-promisifed.lib';
 
+// Constants
 const extractionDirectory = './extracted';
 const metadataStoreDirectory = './metadata'
 
@@ -29,9 +30,9 @@ const flags = cliFlagsExtractor(urls);
 
 /** 
  * Main ETL function
- * @returns {Promise<void>}
+ * @returns {void} nuffin
  * */
-const main = async () => {
+const main = async (): Promise<void> => {
     try {
         const responses = await Promise.allSettled(
             urls.map(async url => {
@@ -88,7 +89,7 @@ const main = async () => {
         });
     } catch (exc) {
         console.log((exc as any)?.message ?? exc);
-        return 1;
+        process.exit(1);
     }
 }
 

@@ -52,21 +52,21 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
     const useDom = new JSDOM(data);
     const document = useDom.window.document;
 
-    const imageTags = Array
+    const imageTagsFound = Array
         .from(document.querySelectorAll('img'))
         .map((img) => (img as HTMLImageElement).src);
 
-    const styleSheets = Array
+    const styleSheetsFound = Array
         .from(document.querySelectorAll('link[rel="stylesheet"]'))
         .map((link) => (link as HTMLLinkElement).href);
 
-    const scripts = Array.from(document.querySelectorAll('script[src]'))
+    const scriptsFound = Array.from(document.querySelectorAll('script[src]'))
         .map((script) => (script as HTMLScriptElement).src);
 
     // Print metadata
-    const numLinks = document.querySelectorAll('a').length;
-    const numImages = document.querySelectorAll('img').length;
-    const lastFetch = new Date().toUTCString();
+    const numberOfLinksOnPage = document.querySelectorAll('a').length;
+    const numberOfImagesOnPage = document.querySelectorAll('img').length;
+    const lastFetched = new Date().toUTCString();
 
     // console.log(metadataStore);
     // const metadataStoreExists = await fs.exists(metadataStore);
@@ -75,28 +75,33 @@ export const processUrl = async (url: string, options: processUrlOptionsType): P
     // }
 
     const metadataFile = metadataStore.concat('/latest.json');
-    let metaData = await import(metadataFile);
+    try {
+        var metaData = await import(metadataFile);
+    } catch (exc) {
+        console.log('Metadata file does not exist, creating one now...');
+        await fs.writeFile(metadataFile, '{}');
+    }
     metaData = { ...metaData };
     delete metaData.default;
 
     metaData[cleanUrl] = {
         url,
-        numLinks,
-        numImages,
-        lastFetch,
+        numberOfLinksOnPage,
+        numberOfImagesOnPage,
+        lastFetched,
     };
 
     await fs.writeFile(metadataFile, JSON.stringify(metaData, null, 2));
 
     console.log(`site: ${cleanUrl}`);
-    console.log(`num_links: ${numLinks}`);
-    console.log(`images: ${numImages}`);
-    console.log(`last_fetch: ${lastFetch}`);
+    console.log(`links_count_on_page: ${numberOfLinksOnPage}`);
+    console.log(`images_on_page: ${numberOfImagesOnPage}`);
+    console.log(`last_fetched: ${lastFetched}`);
 
     const assets = [
-        ...imageTags,
-        ...styleSheets,
-        ...scripts,
+        ...imageTagsFound,
+        ...styleSheetsFound,
+        ...scriptsFound,
     ];
 
     // Download assets and rewrite HTML
